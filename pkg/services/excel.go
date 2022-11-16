@@ -86,19 +86,22 @@ func (e ExcelReader) ReadInput() error {
 				Event:       *event,
 			}
 		}
-		e.jsonExp.Export(topicReg, eventsOutPath+topicReg.Event.Topic.TopicName)
-
+		if topicReg.Application.Appkey != "" {
+			log.Printf("Exporting %s Event Subscription for %s appkey on topic %s", topicReg.Event.EventName, topicReg.Application.Appkey, topicReg.Event.Topic.TopicName)
+			e.jsonExp.Export(topicReg, eventsOutPath+topicReg.Event.Topic.TopicName)
+		}
 		if len(row) > 14 {
 			prods := strings.Split(row[14], "\n")
 			for _, prod := range prods {
 				if prod != "" {
 					prodSub := &model.Subscription{
-						AppKey:    topicReg.Application.Appkey,
+						AppKey:    prod,
 						TopicName: topicReg.Event.Topic.TopicName,
 						SubsType:  0,
 					}
-					finalPath := fmt.Sprintf("%s/producer-%s-%s", subsOutPath, prodSub.AppKey, prodSub.TopicName)
-					if prodSub.AppKey != "" {
+					finalPath := fmt.Sprintf("%s/producer-%s-%s", subsOutPath, prodSub.TopicName, prodSub.AppKey)
+					if prodSub.AppKey != "" && prod != "subtProducers" {
+						log.Printf("Exporting PRODUCER subscription for %s appkey on Topic %s", prodSub.AppKey, prodSub.TopicName)
 						e.jsonExp.Export(prodSub, finalPath)
 					}
 				}
@@ -110,12 +113,13 @@ func (e ExcelReader) ReadInput() error {
 			for _, con := range cons {
 				if con != "" {
 					conSub := &model.Subscription{
-						AppKey:    topicReg.Application.Appkey,
+						AppKey:    con,
 						TopicName: topicReg.Event.Topic.TopicName,
 						SubsType:  1,
 					}
-					finalPath := fmt.Sprintf("%s/consumer-%s-%s", subsOutPath, conSub.AppKey, conSub.TopicName)
-					if conSub.AppKey != "" {
+					finalPath := fmt.Sprintf("%s/consumer-%s-%s", subsOutPath, conSub.TopicName, conSub.AppKey)
+					if conSub.AppKey != "" && con != "subtConsumers" {
+						log.Printf("Exporting CONSUMER subscription for %s appkey on Topic %s", conSub.AppKey, conSub.TopicName)
 						e.jsonExp.Export(conSub, finalPath)
 					}
 				}
@@ -132,9 +136,7 @@ func (e ExcelReader) ReadInput() error {
 }
 
 func parseInt(field string, value string) int {
-	log.Printf("value: %s", value)
 	intValue, err := strconv.Atoi(value)
-	log.Printf("intValue: %d", intValue)
 	if err != nil {
 		log.Fatalf("Invalid not integer value for field: %s  ", field)
 		panic(err)
