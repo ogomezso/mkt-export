@@ -16,13 +16,10 @@ var toolsConfig config.Config
 var exportHandler services.ExportHandler
 
 var rootCmd = &cobra.Command{
-	Use:     "cct",
-	Aliases: []string{"cct-info, cct, cct-exp, cctexp"},
+	Use:     "mktexp",
+	Aliases: []string{"mktexp-info, mktexp, mkt-exp"},
 	Version: version,
-	Short:   "cctools - a simple CLI to manage Clonfluent Cloud",
-	Long: `a simple CLI to manage Clonfluent Cloud
-    
-One can use cctools to ...`,
+	Short:   "mkt-export - a simple CLI to export Confluent Cluster info to MarketPlace API Resources",
 	Run: func(cmd *cobra.Command, args []string) {
 
 	},
