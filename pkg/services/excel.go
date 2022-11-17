@@ -9,6 +9,7 @@ import (
 	"ogomez/mkt-export/pkg/util"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -50,7 +51,8 @@ func (e ExcelReader) ReadInput() error {
 
 		if (row != nil) && (row[0] != "topicName") {
 
-			topicFormatData := parseInt("topicFormatData", row[2])
+			topiccreationDate := time.Now().UTC().Format(time.RFC3339)
+      topicFormatData := parseInt("topicFormatData", row[2])
 			topicType := parseInt("topicType", row[3])
 			topicStatus := parseInt("topicStatus", row[4])
 			topicConfidentialityData := parseInt("topicConfidentialityData", row[5])
@@ -63,6 +65,7 @@ func (e ExcelReader) ReadInput() error {
 				TopicName:                row[0],
 				TopicDescription:         row[1],
 				TopicFormatData:          topicFormatData,
+				TopicCreationDate:        topiccreationDate,
 				TopicType:                topicType,
 				TopicStatus:              topicStatus,
 				TopicConfidentialityData: topicConfidentialityData,
