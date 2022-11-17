@@ -22,12 +22,12 @@ type Topic struct {
 	TopicName                string `json:"topicName"`
 	TopicDescription         string `json:"topicDescription"`
 	TopicFormatData          int    `json:"topicFormatData"`
-	TopicCreationDate        string `json:"topicCreationDate"`
-	TopicType                int    `json:"topicType"`
+  TopicCreationDate        string `json:"topicCreationDate"` 
+  TopicType                int    `json:"topicType"`
 	TopicStatus              int    `json:"topicStatus"`
 	TopicConfidentialityData int    `json:"topicConfidentialityData"`
 	TopicPartitions          int    `json:"topicPartitions"`
-	TopicTTL                 int    `json:"topicTTl"`
+	TopicTTL                 int    `json:"topicTTL"`
 	TopicPlatform            int    `json:"topicPlatform"`
 	TopicCDCsourceTable      string `json:"topicCDCsourceTable"`
 	TopicCategory            int    `json:"topicCategory"`
