@@ -52,7 +52,7 @@ func (e ExcelReader) ReadInput() error {
 		if (row != nil) && (row[0] != "topicName") {
 
 			topiccreationDate := time.Now().UTC().Format(time.RFC3339)
-      topicFormatData := parseInt("topicFormatData", row[2])
+			topicFormatData := parseInt("topicFormatData", row[2])
 			topicType := parseInt("topicType", row[3])
 			topicStatus := parseInt("topicStatus", row[4])
 			topicConfidentialityData := parseInt("topicConfidentialityData", row[5])
@@ -72,16 +72,17 @@ func (e ExcelReader) ReadInput() error {
 				TopicPartitions:          topicPartitions,
 				TopicTTL:                 topicTTL,
 				TopicPlatform:            topicPlatform,
-				TopicCDCsourceTable:      row[9],
+				TopicCDCSourceTable:      row[9],
 				TopicCategory:            topicCategory,
 			}
 			app := &model.Application{
 				Appkey: row[11],
 			}
 			event := &model.Event{
-				EventName:        row[12],
-				EventDescription: row[13],
-				Topic:            *topic,
+				EventName:                row[12],
+				EventDescription:         row[13],
+				EventSchemaCompatibility: 6,
+				Topic:                    *topic,
 			}
 
 			topicReg = model.TopicReg{
