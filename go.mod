@@ -28,13 +28,15 @@ require (
 	golang.org/x/text v0.4.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect; indirect:W
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
+	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/knadh/koanf v1.4.4
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
