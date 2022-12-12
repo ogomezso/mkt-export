@@ -1,17 +1,15 @@
 package config
 
 type Config struct {
-	Input             string            `yaml:"inputpath" validate:"required"`
-	Output            string            `yaml:"export" validate:"required"`
-	MarketPlaceConfig MarketPlaceConfig `yaml:"marketplace" validate:"omitempty"`
+	Input       string            `yaml:"input" validate:"required"`
+	Output      string            `yaml:"output" validate:"required"`
+	Marketplace MarketPlaceConfig `yaml:"marketplace" validate:"required"`
 }
 
 type MarketPlaceConfig struct {
-	AppKey       string      `yaml:"appkey" validate:"required"`
-	MktPlaceUrl  string      `yaml:"url" validation:"required"`
-	Credentials  Credentials `yaml:"credentials" validate:"omitempty"`
-	SchemasPath  string      `yaml:"schemasuri" validate:"omitempty"`
-	ExamplesPath string      `yaml:"examplesPath" validate:"omitempty"`
+	Appkey      string      `yaml:"appkey" validate:"omitempty"`
+	Mktplaceurl string      `yaml:"mktplaceurl" validation:"omitempty"`
+	Credentials Credentials `yaml:"credentials" validate:"omitempty"`
 }
 
 type Credentials struct {

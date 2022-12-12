@@ -4,6 +4,8 @@ go 1.19
 
 require github.com/go-playground/validator v9.31.0+incompatible
 
+require gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
+
 require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -33,10 +35,8 @@ require (
 )
 
 require (
-	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
-	github.com/knadh/koanf v1.4.4
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0

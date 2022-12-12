@@ -29,7 +29,3 @@ func (e *TopicSubtService) Export() {
 		log.Println("Error processing Excel File")
 	}  
 }
-
-func registerTopics()  {
-  
-}

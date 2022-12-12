@@ -14,12 +14,13 @@ var version = "0.0.1"
 var cfgFile string
 var toolsConfig config.Config
 var exportHandler services.ExportHandler
+var register services.RegistrationService
 
 var rootCmd = &cobra.Command{
 	Use:     "mktexp",
 	Aliases: []string{"mktexp-info, mktexp, mkt-exp"},
 	Version: version,
-	Short:   "mkt-export - a simple CLI to export Confluent Cluster info to MarketPlace API Resources",
+	Short:   "mkt-export - a simple CLI to manage Santander's Event MarketPlace API Resources",
 	Run: func(cmd *cobra.Command, args []string) {
 
 	},
@@ -31,7 +32,8 @@ func initConfig() {
 		log.Fatalf("Error Reading Config")
 	}
 	toolsConfig = tConfig
-  exportHandler = *services.NewExportHandler(toolsConfig)
+	exportHandler = *services.NewExportHandler(toolsConfig)
+	register = *services.NewRegistrationService(toolsConfig)
 }
 
 func Execute() {
