@@ -27,5 +27,5 @@ func (e *TopicSubtService) Export() {
 
 	if err != nil {
 		log.Println("Error processing Excel File")
-	}
+	}  
 }

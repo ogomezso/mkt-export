@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var inspectCmd = &cobra.Command{  
+var exportCmd = &cobra.Command{  
 	Use:     "export",
 	Aliases: []string{"mkt-export, mkt-exp, exp"},
 	Short:   "Export Cluster Info for marketplace",
@@ -18,5 +18,5 @@ var inspectCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(inspectCmd)
+	rootCmd.AddCommand(exportCmd)
 }
