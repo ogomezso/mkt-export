@@ -78,7 +78,7 @@ func registerEvents(r *RegistrationService) error {
     headers["Authorization"] = "Bearer "+ r.RClient.Bearer
     headers["X-ClientId"] = r.Config.Marketplace.Appkey
     headers["Content-type"] = "multipart/form-data"
-    r.RClient.PostMultipart(r.Config.Marketplace.Mktplaceurl+"/v2/aggregations/events", reqBody, headers, multipartFiles)
+    r.RClient.PostMultipart(r.Config.Marketplace.Mktplaceurl+"/v2/registry/aggregations/events", reqBody, headers, multipartFiles)
     time.Sleep(1 * time.Second)
 	}
 
@@ -144,7 +144,7 @@ func registerSubscriptions(r *RegistrationService) error {
       headers["Authorization"] = "Bearer "+ r.RClient.Bearer
       headers["X-ClientId"] = r.Config.Marketplace.Appkey
       headers["Content-type"] = "multipart/form-data"
-      r.RClient.Post(r.Config.Marketplace.Mktplaceurl+"/v2/subscriptions_events", reqBody, headers)
+      r.RClient.Post(r.Config.Marketplace.Mktplaceurl+"/v2/registry/subscriptions_events", reqBody, headers)
       time.Sleep(1 * time.Second)
       return nil
     })
