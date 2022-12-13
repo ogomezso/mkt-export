@@ -9,6 +9,7 @@ import (
 	"ogomez/mkt-export/pkg/config"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type RegistrationService struct {
@@ -78,6 +79,7 @@ func registerEvents(r *RegistrationService) error {
     headers["X-ClientId"] = r.Config.Marketplace.Appkey
     headers["Content-type"] = "multipart/form-data"
     r.RClient.PostMultipart(r.Config.Marketplace.Mktplaceurl+"/v2/aggregations/events", reqBody, headers, multipartFiles)
+    time.Sleep(1 * time.Second)
 	}
 
   return nil
@@ -143,6 +145,7 @@ func registerSubscriptions(r *RegistrationService) error {
       headers["X-ClientId"] = r.Config.Marketplace.Appkey
       headers["Content-type"] = "multipart/form-data"
       r.RClient.Post(r.Config.Marketplace.Mktplaceurl+"/v2/subscriptions_events", reqBody, headers)
+      time.Sleep(1 * time.Second)
       return nil
     })
   if err != nil {
