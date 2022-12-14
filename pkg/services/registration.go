@@ -66,22 +66,24 @@ func registerEvents(r *RegistrationService) error {
 		log.Println("-------------")
 
 		multipartFiles := make(map[string]string)
-		requestBody, err := ioutil.ReadFile(files.EventRegFile)
-		if err != nil {
-			return err
-		}
-		if files.SchemaFile != "" {
-			multipartFiles["schema"] = files.SchemaFile
-		}
-		if files.ExampleFile != "" {
-			multipartFiles["example"] = files.ExampleFile
-		}
-		headers := make(map[string]string)
-
-		headers["Authorization"] = "Bearer " + r.RClient.Bearer
-		headers["X-ClientId"] = r.Config.Marketplace.Appkey
-		r.RClient.PostMultipart(r.Config.Marketplace.Mktplaceurl+"/v2/registry/aggregations/events", headers, requestBody, multipartFiles)
-		time.Sleep(1 * time.Second)
+    reqBody, err := ioutil.ReadFile(files.EventRegFile)
+    if err != nil {
+      return err
+    }
+    multipartFiles := make(map[string]string)
+    if files.SchemaFile != "" {
+      multipartFiles["schema"] = files.SchemaFile
+    }
+    if files.ExampleFile != "" {
+      multipartFiles["example"] = files.ExampleFile
+    }
+    headers:= make(map[string]string)
+    
+    headers["Authorization"] = "Bearer "+ r.RClient.Bearer
+    headers["X-ClientId"] = r.Config.Marketplace.Appkey
+    headers["Content-type"] = "multipart/form-data"
+    r.RClient.PostMultipart(r.Config.Marketplace.Mktplaceurl+"/v2/registry/aggregations/events", reqBody, headers, multipartFiles)
+    time.Sleep(1 * time.Second)
 	}
 
 	return nil
@@ -135,6 +137,7 @@ func (r *RegistrationService) getFilePathsByEvent(eventRootPath string) (map[str
 }
 
 func registerSubscriptions(r *RegistrationService) error {
+<<<<<<< HEAD
 	subsPath := r.Config.Input + "/subscriptions"
 	err := filepath.Walk(subsPath,
 		func(path string, info fs.FileInfo, err error) error {
@@ -165,4 +168,25 @@ func registerSubscriptions(r *RegistrationService) error {
 		return err
 	}
 	return nil
+=======
+  subsPath := r.Config.Input + "/subscriptions"
+  err := filepath.Walk(subsPath, 
+    func(path string, info fs.FileInfo, err error) error {
+    reqBody, err := ioutil.ReadFile(path)
+    if err != nil {
+      return err
+    }
+      headers:= make(map[string]string)
+      headers["Authorization"] = "Bearer "+ r.RClient.Bearer
+      headers["X-ClientId"] = r.Config.Marketplace.Appkey
+      headers["Content-type"] = "multipart/form-data"
+      r.RClient.Post(r.Config.Marketplace.Mktplaceurl+"/v2/registry/subscriptions_events", reqBody, headers)
+      time.Sleep(1 * time.Second)
+      return nil
+    })
+  if err != nil {
+    return err
+  }
+ return nil
+>>>>>>> main
 }
