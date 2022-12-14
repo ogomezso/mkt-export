@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"ogomez/mkt-export/pkg/config"
 	"path/filepath"
+	"strings"
 )
 
 type RestClient struct {
@@ -56,73 +57,87 @@ func (RClient *RestClient) Post(requestURL string, requestBody []byte, headers m
 	if err != nil {
 		return nil, err
 	}
-  req = setHeaders(req, headers)
+	req = setHeaders(req, headers)
 	resp, err := RClient.buildArrayRequest(req)
 	if err != nil {
+		log.Println(fmt.Sprint(err))
 		return nil, err
 	}
 
 	return resp, nil
 }
 
-func (RClient *RestClient) PostMultipart(requestURL string, requestBody []byte, headers map[string]string, files map[string]string) ([]interface{}, error) {
+func (RClient *RestClient) PostMultipart(requestURL string, headers map[string]string, requestBody []byte, files map[string]string) ([]interface{}, error) {
 
 	body := &bytes.Buffer{}
 	// Creates a new multipart Writer with a random boundary
 	// writing to the empty buffer
 	writer := multipart.NewWriter(body)
 
-	// Create new multipart part
-	part, err := writer.CreateFormField("eventRegistration")
-	if err != nil {
-		return nil, err
-	}
-	// Write the part body
-	part.Write(requestBody)
+	bodyPart, err := writer.CreateFormField("eventRegistration")
+  bodyString := string(requestBody)
+  fmt.Printf("bodyString: %v\n", bodyString)
+  io.Copy(bodyPart, strings.NewReader(bodyString))
 
-  if schemaFilepath, ok := files["schema"]; ok {
+  // Write the part body
+	if schemaFilepath, ok := files["schema"]; ok {
 		_, schemaFileName := filepath.Split(schemaFilepath)
-    schemaFile, err := ioutil.ReadFile(schemaFilepath)
-    if err != nil {
-      return nil, err
-    }
-    schemaFilePart, err := writer.CreateFormFile("fileDocumentation", schemaFileName)
-    io.Copy(schemaFilePart, bytes.NewReader(schemaFile))
-  }
+		schemaFile, err := ioutil.ReadFile(schemaFilepath)
+		if err != nil {
+			log.Println(fmt.Sprint(err))
+			return nil, err
+		}
+		schemaFilePart, err := writer.CreateFormFile("fileDocumentation", schemaFileName)
+		if schemaFile != nil {
+			io.Copy(schemaFilePart, bytes.NewReader(schemaFile))
+		}
+	} else {
+		log.Println("No Documentation file present")
+		writer.CreateFormField("fileDocumentation")
+	}
 
-  if exampleFilepath, ok := files["example"]; ok {
+	if exampleFilepath, ok := files["example"]; ok {
 		_, exampleFileName := filepath.Split(exampleFilepath)
-    exampleFile, err := ioutil.ReadFile(exampleFilepath)
-    if err != nil {
-      return nil, err
-    }
-    exampleFilePart, err := writer.CreateFormFile("fileDocumentation", exampleFileName)
-    io.Copy(exampleFilePart, bytes.NewReader(exampleFile))
-  }
+		exampleFile, err := ioutil.ReadFile(exampleFilepath)
+		if err != nil {
+			log.Println(fmt.Sprint(err))
+			return nil, err
+		}
+		exampleFilePart, err := writer.CreateFormFile("fileExample", exampleFileName)
+		if exampleFile != nil {
+			io.Copy(exampleFilePart, bytes.NewReader(exampleFile))
+		}
+	} else {
+		log.Println("No Example File present")
+		writer.CreateFormField("fileExample")
+	}
 	writer.Close()
 
 	req, err := http.NewRequest(http.MethodPost, requestURL, bytes.NewReader(body.Bytes()))
 	if err != nil {
+		log.Println(fmt.Sprint(err))
 		return nil, err
 	}
 
-  req = setHeaders(req, headers)
+	req = setHeaders(req, headers)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	log.Println(req.Header)
 	resp, err := RClient.buildArrayRequest(req)
 	if err != nil {
+		log.Println(fmt.Println(err))
 		return nil, err
 	}
 
-  log.Println("response")
 	return resp, nil
 }
-
 
 func (RClient *RestClient) Get(requestURL string, headers map[string]string) (interface{}, error) {
 	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
 	if err != nil {
 		return nil, err
 	}
-  req = setHeaders(req, headers)
+	req = setHeaders(req, headers)
 	resp, err := RClient.buildRequest(req)
 	if err != nil {
 		return nil, err
@@ -137,7 +152,7 @@ func (RClient *RestClient) GetList(requestURL string, headers map[string]string)
 	if err != nil {
 		return nil, err
 	}
-	req = setHeaders(req,headers)
+	req = setHeaders(req, headers)
 	resp, err := RClient.buildArrayRequest(req)
 	if err != nil {
 		return nil, err
@@ -217,9 +232,9 @@ func getTransport(certificates config.Certificates) *http.Transport {
 
 }
 
-func setHeaders(req *http.Request, headers map[string]string) *http.Request{
-  for k, v := range headers {
-    req.Header.Set(k,v)
-  }
-  return req
+func setHeaders(req *http.Request, headers map[string]string) *http.Request {
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+	return req
 }

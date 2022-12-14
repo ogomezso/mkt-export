@@ -34,27 +34,29 @@ func NewRegistrationService(conf config.Config) *RegistrationService {
 }
 
 func (r *RegistrationService) Register() error {
-  err := registerEvents(r)  
-  if err != nil {
-    return nil
-  }   
+	err := registerEvents(r)
+	if err != nil {
+		log.Printf("Error registering events: %s", fmt.Sprint(err))
+		return err
+	}
 
-  err1 := registerSubscriptions(r)
-  if err1 != nil {
-    return nil
-  }
+	err1 := registerSubscriptions(r)
+	if err1 != nil {
+		log.Printf("Error Registering subscriptions: %s", fmt.Sprint(err1.Error()))
+		return err1
+	}
 
-  return nil
+	return nil
 }
 
 func registerEvents(r *RegistrationService) error {
-  eventsPath := r.Config.Input + "/events"
-  filesByEvent, err := r.getFilePathsByEvent(eventsPath)
+	eventsPath := r.Config.Input + "/events"
+	filesByEvent, err := r.getFilePathsByEvent(eventsPath)
 	if err != nil {
 		return err
 	}
 	for _, files := range filesByEvent {
-    log.Printf("Registering event for %s  topic on marketplace", files.TopicName)
+		log.Printf("Registering event for %s  topic on marketplace", files.TopicName)
 		log.Println("-------------")
 		log.Println(files.TopicName)
 		log.Println("-------------")
@@ -62,27 +64,27 @@ func registerEvents(r *RegistrationService) error {
 		log.Println(files.SchemaFile)
 		log.Println(files.ExampleFile)
 		log.Println("-------------")
-    reqBody, err := ioutil.ReadFile(files.EventRegFile)
-    if err != nil {
-      return err
-    }
-    multipartFiles := make(map[string]string)
-    if files.SchemaFile != "" {
-      multipartFiles["schema"] = files.SchemaFile
-    }
-    if files.ExampleFile != "" {
-      multipartFiles["example"] = files.ExampleFile
-    }
-    headers:= make(map[string]string)
-    
-    headers["Authorization"] = "Bearer "+ r.RClient.Bearer
-    headers["X-ClientId"] = r.Config.Marketplace.Appkey
-    headers["Content-type"] = "multipart/form-data"
-    r.RClient.PostMultipart(r.Config.Marketplace.Mktplaceurl+"/v2/registry/aggregations/events", reqBody, headers, multipartFiles)
-    time.Sleep(1 * time.Second)
+
+		multipartFiles := make(map[string]string)
+		requestBody, err := ioutil.ReadFile(files.EventRegFile)
+		if err != nil {
+			return err
+		}
+		if files.SchemaFile != "" {
+			multipartFiles["schema"] = files.SchemaFile
+		}
+		if files.ExampleFile != "" {
+			multipartFiles["example"] = files.ExampleFile
+		}
+		headers := make(map[string]string)
+
+		headers["Authorization"] = "Bearer " + r.RClient.Bearer
+		headers["X-ClientId"] = r.Config.Marketplace.Appkey
+		r.RClient.PostMultipart(r.Config.Marketplace.Mktplaceurl+"/v2/registry/aggregations/events", headers, requestBody, multipartFiles)
+		time.Sleep(1 * time.Second)
 	}
 
-  return nil
+	return nil
 }
 
 func (r *RegistrationService) getFilePathsByEvent(eventRootPath string) (map[string]EventFiles, error) {
@@ -133,24 +135,34 @@ func (r *RegistrationService) getFilePathsByEvent(eventRootPath string) (map[str
 }
 
 func registerSubscriptions(r *RegistrationService) error {
-  subsPath := r.Config.Input + "/subscriptions"
-  err := filepath.Walk(subsPath, 
-    func(path string, info fs.FileInfo, err error) error {
-    reqBody, err := ioutil.ReadFile(path)
-    if err != nil {
-      return err
-    }
-      headers:= make(map[string]string)
-      headers["Authorization"] = "Bearer "+ r.RClient.Bearer
-      headers["X-ClientId"] = r.Config.Marketplace.Appkey
-      headers["Content-type"] = "multipart/form-data"
-      r.RClient.Post(r.Config.Marketplace.Mktplaceurl+"/v2/registry/subscriptions_events", reqBody, headers)
-      time.Sleep(1 * time.Second)
-      return nil
-    })
-  if err != nil {
-    return err
-  }
- return nil
+	subsPath := r.Config.Input + "/subscriptions"
+	err := filepath.Walk(subsPath,
+		func(path string, info fs.FileInfo, err error) error {
+			if err != nil {
+				log.Println(fmt.Sprint(err.Error()))
+				return err
+			}
+			_, filename := filepath.Split(path)
+			if filename != "subscriptions" {
+				log.Printf("Registrando Subscripcion para: %s", filename)
+				log.Println("------------------------------")
+				subfile := subsPath + "/" + filename
+				reqBody, err := ioutil.ReadFile(subfile)
+				if err != nil {
+					log.Println(fmt.Sprint(err))
+					return err
+				}
+				headers := make(map[string]string)
+				headers["Authorization"] = "Bearer " + r.RClient.Bearer
+				headers["X-ClientId"] = r.Config.Marketplace.Appkey
+				headers["Content-type"] = "application/json"
+				r.RClient.Post(r.Config.Marketplace.Mktplaceurl+"/v2/registry/subscriptions_events", reqBody, headers)
+				time.Sleep(1 * time.Second)
+			}
+			return nil
+		})
+	if err != nil {
+		return err
+	}
+	return nil
 }
-
