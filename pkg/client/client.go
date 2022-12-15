@@ -13,9 +13,9 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"ogomez/mkt-export/pkg/config"
 	"path/filepath"
-	"strings"
 )
 
 type RestClient struct {
@@ -74,12 +74,19 @@ func (RClient *RestClient) PostMultipart(requestURL string, headers map[string]s
 	// writing to the empty buffer
 	writer := multipart.NewWriter(body)
 
-	bodyPart, err := writer.CreateFormField("eventRegistration")
-  bodyString := string(requestBody)
-  fmt.Printf("bodyString: %v\n", bodyString)
-  io.Copy(bodyPart, strings.NewReader(bodyString))
-
-  // Write the part body
+	// Metadata part
+	metadataHeader := textproto.MIMEHeader{}
+	// Set the Content-Type header
+	metadataHeader.Set("Content-Type", "application/json; charset=UTF-8")
+	metadataHeader.Set("Content-Disposition", "form-data; name=\"eventRegistration\"")
+	// Create new multipart bodyPart
+	bodyPart, err := writer.CreatePart(metadataHeader)
+	if err != nil {
+		return nil, err
+	}
+	// Write the part body
+	bodyPart.Write(requestBody)
+	// Write the part body
 	if schemaFilepath, ok := files["schema"]; ok {
 		_, schemaFileName := filepath.Split(schemaFilepath)
 		schemaFile, err := ioutil.ReadFile(schemaFilepath)
@@ -111,19 +118,19 @@ func (RClient *RestClient) PostMultipart(requestURL string, headers map[string]s
 		log.Println("No Example File present")
 		writer.CreateFormField("fileExample")
 	}
-	writer.Close()
 
+	writer.Close()
+ 
 	req, err := http.NewRequest(http.MethodPost, requestURL, bytes.NewReader(body.Bytes()))
 	if err != nil {
 		log.Println(fmt.Sprint(err))
 		return nil, err
 	}
 
-	req = setHeaders(req, headers)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-
-	log.Println(req.Header)
-	resp, err := RClient.buildArrayRequest(req)
+  req = setHeaders(req,headers)
+  req.Header.Set("Content-Type", writer.FormDataContentType())
+	
+  resp, err := RClient.buildArrayRequest(req)
 	if err != nil {
 		log.Println(fmt.Println(err))
 		return nil, err
