@@ -104,15 +104,12 @@ func (r *RegistrationService) getFilePathsByEvent(eventRootPath string) (map[str
 				case strings.HasSuffix(name, "--schema"):
 					eventFile.SchemaFile = eventRootPath + "/" + filename
           filesByEvent[topicName] = eventFile
-          log.Printf("schema: filename: %s event file: %v filesByEvent: %v\n", filename, eventFile, filesByEvent[topicName])
 				case strings.HasSuffix(name, "--example"):
 					eventFile.ExampleFile = eventRootPath + "/" + filename
           filesByEvent[topicName] = eventFile
-          log.Printf("example: filename: %s event file: %v filesByEvent: %v\n", filename, eventFile, filesByEvent[topicName])
         default:
           eventFile.EventRegFile = eventRootPath + "/" + filename
           filesByEvent[topicName] = eventFile
-          log.Printf("event: filename: %s event file: %v filesByEvent: %v\n", filename, eventFile, filesByEvent[topicName])
 				}
 			} else {
 				switch {
@@ -121,13 +118,11 @@ func (r *RegistrationService) getFilePathsByEvent(eventRootPath string) (map[str
 						TopicName:  topicName,
 						SchemaFile: eventRootPath + "/" + filename,
 					}
-					log.Printf("file name - else schema: %s \n", filename)
 				case strings.HasSuffix(name, "--example"):
 					filesByEvent[topicName] = &EventFiles{
 						TopicName:   topicName,
 						ExampleFile: eventRootPath + "/" + filename,
 					}
-					log.Printf("topic name - else example: %s \n", topicName)
 
 				default:
 					filesByEvent[topicName] = &EventFiles{
