@@ -1,3 +1,5 @@
+[![release](https://github.com/ogomezso/mkt-export/actions/workflows/release.yaml/badge.svg)](https://github.com/ogomezso/mkt-export/actions/workflows/release.yaml)
+
 # Marketplace *Export Tool
 
 ## Use
